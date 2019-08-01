@@ -51,31 +51,69 @@ class Deck:
     def shuffle(self):
         shuffle(self.cards)
 
-    def deal(self, num):
-        dealt_cards = [None] * num
+    def deal(self, player, num):
         for i in range(num):
-            dealt_cards[i] = self.cards.pop(-1)
-        return dealt_cards
+            new_card = self.cards.pop(-1)
+            player.add_card(new_card)
 
-class Hand:
+'''
+DEFINING A PLAYER
+'''
 
-    def __init__(self):
-        self.cards = [Card]
+class Player:
 
-    def value(self):
-        pass
+    def __init__(self, name):
+        self.name = name
+        self.cards_in_hand = []
 
-    def add(self, new_cards):
-        pass
+    def value_of_hand(self):
+        value = 0
+        ##### CANT USE c == 'x', MUST GET TO THE RANK OF THE CARD
+        num_aces = len([c for c in self.cards_in_hand if c == 'ace'])
+        num_non_aces = len(self.cards_in_hand) - num_aces
+        print(num_aces)
+        print(num_non_aces)
 
+        # value calculations for all except any aces
+        if num_non_aces > 0:
+            for c in filter(lambda x: x != 'ace', self.cards_in_hand):
+                if c in range(2, 10):
+                    value += int(c)
 
+                elif c in ['jack', 'queen', 'king']:
+                    value += 10
 
+        # if we've got one ace, it'll contribute 10 to the value, otherwise only one
+        if num_aces == 1:
+            if value <= 10:
+                value += 11
+            else:
+                value += 1
+        # if we've got two (or more!) aces, at most one ace will contribute 10 to the value,
+        # otherwise 1 each.
+        elif num_aces > 1:
+            if value >= 10:
+                value += num_aces
+            else:
+                value += 10 + (num_aces - 1)
+        return value
+
+    def add_card(self, new_card, reveal = False):
+        self.cards_in_hand.append(new_card)
+        if reveal:
+            print(f"Dealt to {self.name}: {new_card}")
+        else:
+            print(f"Dealt to {self.name}: some card")
+
+    def __str__(self):
+        res = "\nCards held by " + self.name + ":\n" + '\n'.join(map(str, self.cards_in_hand)) +\
+            "\n\nValue of hand = " + str(self.value_of_hand())
+        return res
 
 mydeck = Deck()
-#print(mydeck)
 mydeck.shuffle()
-x = mydeck.deal(2)
-print(mydeck)
-print(x)
-#print("New hand\n" + x)
+human = Player("Player")
+mydeck.deal(human, 3)
+print(human)
+#human.value_of_hand()
 
