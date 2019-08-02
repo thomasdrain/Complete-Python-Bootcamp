@@ -68,22 +68,18 @@ class Player:
 
     def value_of_hand(self):
         value = 0
-        ##### CANT USE c == 'x', MUST GET TO THE RANK OF THE CARD
-        num_aces = len([c for c in self.cards_in_hand if c == 'ace'])
+        num_aces = len([c for c in self.cards_in_hand if c.rank == 'ace'])
         num_non_aces = len(self.cards_in_hand) - num_aces
-        print(num_aces)
-        print(num_non_aces)
 
         # value calculations for all except any aces
         if num_non_aces > 0:
-            for c in filter(lambda x: x != 'ace', self.cards_in_hand):
-                if c in range(2, 10):
-                    value += int(c)
-
-                elif c in ['jack', 'queen', 'king']:
+            for c in filter(lambda x: x.rank != 'ace', self.cards_in_hand):
+                if c.rank in ['jack', 'queen', 'king']:
                     value += 10
+                elif int(c.rank) in range(2, 11):
+                    value += int(c.rank)
 
-        # if we've got one ace, it'll contribute 10 to the value, otherwise only one
+        # if we've got one ace and a hand value less than 11, it'll contribute 10 to the value, otherwise only one
         if num_aces == 1:
             if value <= 10:
                 value += 11
@@ -115,5 +111,7 @@ mydeck.shuffle()
 human = Player("Player")
 mydeck.deal(human, 3)
 print(human)
-#human.value_of_hand()
 
+# next steps:
+# put together while loop skeleton simulating a turn
+# create a 'stand', 'hit' method
